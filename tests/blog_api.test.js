@@ -34,8 +34,9 @@ test('post create a new blog post', async () => {
 
     await api
     .post('/api/blogs')
+    .set('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmlvOTkiLCJpZCI6IjVlYjA3MGNhNzNhNThmMTVjNGJjNWZhNSIsImlhdCI6MTU4ODYyNzA4NX0.M2rd6_-sD9uO-CJcpBnjWAItITn8tryKhLeSb_Q8JeM')
     .send(newBlog)
-    .expect(201)
+    .expect(200)
     .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
@@ -52,9 +53,12 @@ test('blog without likes, likes default is 0', async () => {
         title: "React patterns", 
         author: "Michael Chan", 
         url: "https://reactpatterns.com/"}
+
+ 
   
     await api
       .post('/api/blogs')
+      .set('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmlvOTkiLCJpZCI6IjVlYjA3MGNhNzNhNThmMTVjNGJjNWZhNSIsImlhdCI6MTU4ODYyNzA4NX0.M2rd6_-sD9uO-CJcpBnjWAItITn8tryKhLeSb_Q8JeM')
       .send(newBlog)
   
       const r = await api.get('/api/blogs') 
@@ -68,8 +72,22 @@ test('blog title and url missing response 400 bad request', async () => {
   
     await api    
       .post('/api/blogs')
+      .set('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmlvOTkiLCJpZCI6IjVlYjA3MGNhNzNhNThmMTVjNGJjNWZhNSIsImlhdCI6MTU4ODYyNzA4NX0.M2rd6_-sD9uO-CJcpBnjWAItITn8tryKhLeSb_Q8JeM')
       .send(newBlog)
       .expect(400)
+
+})
+
+test('adding a blog fails with proper status code 401 Unauthorized if token is not provided', async () => {
+    const newBlog =  { 
+        title: "React patterns", 
+        author: "Michael Chan", 
+        url: "https://reactpatterns.com/"}
+
+    await api    
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
 
 })
 

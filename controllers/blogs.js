@@ -1,6 +1,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const middleware = require('../utils/middleware')
+
 
 
 
@@ -12,11 +14,18 @@ blogsRouter.get('/', async (request, response, next) => {
   response.json(blogs.map(blog => blog.toJSON()))
   })
   
+
 blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
 
-    const user = await User.findById('5eb070ca73a58f15c4bc5fa5')
+  if(request.token === null){
+     response.status(401).end()
+  }
+  else {
 
+  const user = await User.findById(request.token.id)
+
+  
     const blog= new Blog ({
       likes: body.likes,
       title: body.title,
@@ -29,13 +38,24 @@ blogsRouter.post('/', async (request, response, next) => {
     await user.save()
 
     response.json(savedBlog.toJSON())
-     
+    }
 
   })
 
 blogsRouter.delete('/:id', async (request, response, next) => {
-  await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
+  
+  const user = await User.findById(request.token.id)
+  const blog = await Blog.findById(request.params.id)
+
+  if(user._id.toString() === blog.user.toString())
+  {
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  }
+  else {
+    response.status(401).end()
+  }
+  
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {
